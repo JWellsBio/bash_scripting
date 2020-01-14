@@ -1,0 +1,280 @@
+#### this is a cheat sheet for shell scripting set up for members of the Miller
+#### Lab to use after I am gone
+### copy/paste small script that starts with shebang
+### and run in terminal to see what it does
+
+## start with the shebang
+#!/bin/bash
+
+## declare variable by UPPERCASE name (can only contain letters, numbers, and
+## underscores and cannot start with a number)
+MY_VARIABLE = 'name'
+
+## use the variable
+#!/bin/bash
+MY_NAME = 'Jason'
+echo 'My name is $MY_NAME'
+
+## OR:
+#!/bin/bash
+MY_NAME = 'Jason'
+echo 'My name is ${MY_NAME}' ##use the curlies when other syntax is attached
+##to variable
+
+## assigning command to variable
+#!/bin/bash
+SERVER = $(hostname)
+echo 'I am running this on ${SERVER}'
+
+## TESTS
+help test
+## this gives a list of all available test commands
+
+## if statement
+# standard form
+if [condition -true]
+then
+  commands
+  commands
+fi
+
+## example
+#!/bin/bash
+MY_NAME = 'Jason'
+
+if ['$MY_NAME' = 'Jason']
+then
+  echo 'My name is definitely Jason'
+fi
+
+## if/else statement
+# standard form
+if [condition -true]
+then
+  commands
+  commands
+else
+  commands
+fi
+
+## example
+#!/bin/bash
+MY_NAME = 'Jason'
+
+if ['$MY_NAME' = 'Daniel']
+then
+  echo 'My name is definitely Daniel'
+else
+  echo 'My name is definitely not Daniel'
+fi
+
+## elif statement
+# standard form
+if [condition -true]
+then
+  commands
+elif [condition -true]
+then
+  commands
+else
+  commands
+fi
+
+## example
+#!/bin/bash
+MY_NAME = 'Jason'
+
+if ['$MY_NAME' = 'Daniel']
+then
+  echo 'My name is definitely Daniel'
+elif ['$MY_NAME' = 'Todd']
+  echo 'My name is definitely Todd'
+else
+  echo 'My name is definitely not Daniel or Todd'
+fi
+
+## for loop
+# standard form
+for VARIABLE_NAME in VAR_1 VAR_2 VAR_3 VAR_4
+do
+  commands
+  commands
+done
+
+## example
+#!/bin/bash
+for TEAM in Eagles Patriots Browns
+do
+  echo 'NFL team: $TEAM'
+done
+
+## OR:
+#!/bin/bash
+TEAMS = 'Eagles Patriots Browns'
+
+for TEAM in TEAMS
+do
+  echo 'NFL team: $TEAM'
+done
+
+## this example looks for all files of a certain type and adds today's date
+## to the file name
+#!/bin/bash
+PICTURES = $(ls *jpg)
+DATE = $(date +%F)
+
+for PICTURE in PICTURES
+do
+  echo 'Renaming ${PICTURE} to ${PICTURE}_${DATE}'
+  mv ${PICTURE} ${PICTURE}_${DATE}
+done
+
+## you can also put parameters in the command line and call by position
+## standard form
+$ script.sh param_1 param_2 param_3
+# $0 is the script
+# $1 is param_1, etc.
+
+## in for loop you can access all pos'l params from $1 to the end with $@
+## example
+for POSITION_PARAM in $@
+do
+  echo 'See this: $POSITION_PARAM'
+done
+
+## getting user input
+## read command allows for user input
+## standard form of read
+#!/bin/bash
+
+read -p 'Enter your name:' USER
+
+echo 'Your name is ${USER}'
+
+
+## using exit statuses
+## variable $? returns exit code, 0 if all good
+
+## this example pings the host and -c 1 says to ping 1 time
+#!/bin/bash
+HOST = 'google.com' #we are pinging google
+ping -c 1 $HOST #this pings google once
+
+if ['$?' -eq '0']
+then
+  echo '${HOST} reachable'
+else
+  echo '${HOST} not reachable'
+fi
+
+## or just checking if unreachable
+#!/bin/bash
+HOST = 'google.com'
+ping -c 1 $HOST
+
+if ['#?' -ne '0']
+then
+  echo '${HOST} not reachable'
+fi
+
+##OR:
+#!/bin/bash
+HOST = 'google.com'
+ping -c 1 $HOST
+RETURN_CODE = $?
+
+if ['$RETURN_CODE' -ne '0']
+then
+  echo '${HOST} not reachable'
+fi
+
+
+## you can also use conditional logic statements
+## && means execute next only if previous statement succeeds
+## || means execute next only if previous statement fails
+
+## example
+mkdir /tmp_2/ && cp test.txt /tmp_2/
+## if tmp_2 is created (return status 0) then txt file will be copied in
+
+## example
+cp test.txt /tmp_2/txt_files/ || cp test.txt /tmp_2
+## is txt file cannot be copied into txt_files (return != 0) it is copied into
+## parent folder
+
+## using previous google examples
+#!/bin/bash
+HOST = 'google.com'
+ping -c 1 $HOST && echo '${HOST} reachable'
+
+#!/bin/bash
+HOST = 'google.com'
+ping -c 1 $HOST || echo '${HOST} not reachable'
+
+#OR:
+## you can connect with semicolon and everything gets executed regardless
+
+
+## creating and using functions
+## creating a function
+## standard form
+name_of_your_function() {
+  commands
+  commands
+  commands
+}
+## then you just call it in a script
+
+## example
+#!/bin/bash
+
+say_hello() {
+  echo 'Hello'
+}
+
+hello
+
+## using pos'l params in the function call in the script
+#!/bin/bash
+
+hello() {
+  echo 'Hello $1'
+}
+
+hello Jason
+
+## loop through multiple parameters
+#!/bin/bash
+
+nfl_teams() {
+  for TEAM in $@
+  do
+    echo 'NFL team: ${TEAM}'
+  done
+}
+
+nfl_teams Eagles Patriots Browns
+
+## use of wildcards
+*.txt calls all files with .txt extension
+?.txt calls files with only one character in file name plus .txt
+[aeiou] allows for matching any vowel in that position
+[!aeiou] allows for any character aside from vowels in that position
+[a-e] allows for any letter from a to e (inclusive) at that position
+[:alpha:] matches any letter (upper and lowercase)
+[:alnum:] matches any letter (upper and lower) and numbers
+[:digit:] matches numbers in decimal, 0 to 9
+[:lower:] matches lowercase letters
+[:space:] matches any whitespace characters
+[:upper:] matches uppercase letters
+use \ to escape and search for wildcards
+
+## CHECKLIST
+1) Start with a shebang
+  #!/bin/bash
+2) Include an initial comment describing the script
+3) Define global variables at the top of the script
+4) Define functions immediately after
+5) Make sure functions use local variables
+6) Main body follows fxns
+7) Make sure script exits with expected status
